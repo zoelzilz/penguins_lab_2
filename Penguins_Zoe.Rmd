@@ -34,7 +34,6 @@ can use table function to calculate counts based on however many factors you giv
 
 ```{r}
 
-View(penguins)
 counts <- with(penguins, table(species,sex))
 
 #updating dataset because Allison doesn't like penguin names
@@ -81,3 +80,52 @@ qqs
 #based on qq plots and hists, obs for each group appear normall distributed. also n > 30 for all groups, so means will be normally distributed by CLT
 ```
 
+Evaluate variance and perform a Levene's Test for equal variances
+
+If the largest sample variance is < 4x greater than the smallest sample variance, then these are "close enough" to consider variances equal
+
+```{r}
+
+#using group_by
+variances <- penguins2 %>% 
+  group_by(common_name) %>% 
+  summarize(
+    variance = var(flipper_length)
+  )
+
+variances # the largest variance is definitely not more than 4x the smallest variance
+
+# Levene's Test
+# leveneTest function in 'car'
+
+levene_penguin <- leveneTest(flipper_length ~ common_name, data = penguins2)
+levene_penguin
+
+# H0: no difference in variances (equal)
+# HA: Variances are NOT equal
+
+# Here, there is not significant differnece in variances across species p > 0.05
+```
+
+One-Way ANOVA for penguin flipper lengths by species (common_name)
+
+```{r}
+# ASKING R: please compare means based on the rand variable flipper_length as a function of common_name, and you're going to get that from penguins2
+
+penguin_aov <- aov(flipper_length ~ common_name, data = penguins2)
+summary(penguin_aov)
+
+# then full report using summary to get anova outcome
+
+# H0: Means across all groups are equal
+# HA: At least two group means differ significantly
+
+#follow up, post hoc, which differ?
+
+#Tukey's HSD (works nicely with aov() function )
+
+penguin_ph <- TukeyHSD(penguin_aov)
+penguin_ph
+```
+###Type of statement you can make
+Mean flipper lengths of female penguins differed significantly for all species studied (one-way anova, F(df) = statistic, p < 0.001, $\alpha$ = 0.05 with post hoc Tukey's HSD, $\alpha$ = 0.05)
