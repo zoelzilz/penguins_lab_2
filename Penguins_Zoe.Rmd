@@ -1,0 +1,55 @@
+---
+title: "Penguins_Zoe"
+author: "Zoe Zilz"
+date: "11/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Load packages and read in penguins.csv
+```{r}
+library(tidyverse)
+library(car)
+library(onewaytests)
+
+penguins <- read.csv("penguins.csv")
+```
+###Our question is: Is there a significant difference in mean flipper lengths for female chinstrap, gentoo, and adelie penguins near Palmer Archipelago
+
+How many factors do I have? 
+1 - Species
+3 levels - chinstrap, gentoo, adelie
+1 continuous random variable - flipper length
+
+More than 2 groups for continuous measured data -- maybe I can use a one way ANOVA?
+assume: independent observations - sure
+assume: equal variance - will use Levene's test for
+assume: normality - use histograms and qq plots to explore this
+
+First, want to know how many observations are in each group (why?)
+can use table function to calculate counts based on however many factors you give it
+
+```{r}
+
+View(penguins)
+counts <- with(penguins, table(species,sex))
+
+#updating dataset because Allison doesn't like penguin names
+# using case when to add a column called "common name"
+
+penguins2 <- penguins %>% 
+  mutate(
+    common_name =
+      case_when(
+        species == "Chinstrap penguin (Pygoscelis antarctica)" ~ "chinstrap",
+        species == "Adelie Penguin (Pygoscelis adeliae)" ~ "adelie",
+        species == "Gentoo penguin (Pygoscelis papua)" ~ "gentoo"
+      )
+  ) %>% 
+  select(-species) %>% 
+  filter(sex =="FEMALE")
+```
+
