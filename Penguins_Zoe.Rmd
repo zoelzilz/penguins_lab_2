@@ -52,4 +52,32 @@ penguins2 <- penguins %>%
   select(-species) %>% 
   filter(sex =="FEMALE")
 ```
+Exploratory graphs and Levene's test for equal variances
+
+```{r}
+# maybe grouped differently?
+hist1 <- ggplot(penguins2, aes( x = flipper_length))+
+  geom_histogram(aes(fill = common_name))
+
+hist1
+#yeah!
+
+#normally distributed?
+hist2 <- ggplot(penguins2, aes( x = flipper_length))+
+  geom_histogram(aes(fill = common_name))+
+  facet_wrap(~common_name, scale = "free")
+
+hist2
+
+
+#looks pretty norm
+
+qqs <- ggplot(penguins2, aes(sample = flipper_length)) +
+  geom_qq(aes(color = common_name)) +
+  facet_wrap(~common_name, scale = "free")
+
+qqs
+
+#based on qq plots and hists, obs for each group appear normall distributed. also n > 30 for all groups, so means will be normally distributed by CLT
+```
 
